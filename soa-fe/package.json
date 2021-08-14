@@ -2,6 +2,13 @@
   "name": "soa-fe",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "lint:fix": "eslint --fix \"./**/*.ts\" \"./**/*.tsx\""
+  },
   "dependencies": {
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
@@ -19,11 +26,13 @@
     "typescript": "^4.3.5",
     "web-vitals": "^1.1.2"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+  "devDependencies": {
+    "@devexperts/lint": "^1.0.0-alpha.14",
+    "@types/prettier": "^1.18.2",
+    "@types/styled-components": "^5.1.12",
+    "eslint": "7.32.0",
+    "eslint-plugin-node": "^11.1.0",
+    "prettier": "^1.18.2"
   },
   "eslintConfig": {
     "extends": [
@@ -44,8 +53,5 @@
     ]
   },
   "main": "index.js",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/styled-components": "^5.1.12"
-  }
+  "license": "MIT"
 }
