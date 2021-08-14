@@ -14,10 +14,7 @@ export const createTestProvider = (): TestProvider => {
 					method: 'POST',
 				})
 					.then(res => res.text())
-					.then(data => {
-						console.log(data);
-						return right(data);
-					})
+					.then(data => right(data))
 					.catch(e => left<any>(e)),
 			),
 	};
