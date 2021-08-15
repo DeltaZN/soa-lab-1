@@ -19,7 +19,7 @@ export const App = () => {
 					res,
 					either.fold(
 						e => setLabel(some(e.toString())),
-						data => setLabel(some(data)),
+						data => setLabel(some(JSON.stringify(data))),
 					),
 				),
 			),
