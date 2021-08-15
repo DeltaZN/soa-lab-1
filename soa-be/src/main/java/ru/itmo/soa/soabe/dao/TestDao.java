@@ -22,7 +22,7 @@ public class TestDao {
             TestEntity testEntity = new TestEntity();
             session.save(testEntity);
             transaction.commit();
-            return Optional.of(converter.convert(testEntity));
+            return Optional.of(converter.toStr(testEntity));
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();

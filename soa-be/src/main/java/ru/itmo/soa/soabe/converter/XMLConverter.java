@@ -1,13 +1,13 @@
 package ru.itmo.soa.soabe.converter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import javax.xml.bind.*;
+import java.io.File;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 public class XMLConverter implements Converter {
     @Override
-    public <T> String convert(T object) {
+    public <T> String toStr(T object) {
         try {
             JAXBContext context = JAXBContext.newInstance(object.getClass());
             Marshaller marshaller = context.createMarshaller();
@@ -19,5 +19,10 @@ public class XMLConverter implements Converter {
             ex.printStackTrace();
         }
         return "";
+    }
+
+    @Override
+    public <T> T fromStr(String str, Class<T> tClass) {
+        return JAXB.unmarshal(new StringReader(str), tClass);
     }
 }
