@@ -1,4 +1,3 @@
-import { BASE_URL } from '../App';
 import { from, Observable } from 'rxjs';
 import { Either, left, right } from 'fp-ts/Either';
 
@@ -10,7 +9,7 @@ export const createTestProvider = (): TestProvider => {
 	return {
 		doTest: () =>
 			from(
-				fetch(`${BASE_URL}/hello-servlet`, {
+				fetch(`hello-servlet`, {
 					method: 'POST',
 				})
 					.then(res => res.text())

@@ -1,12 +1,12 @@
 package ru.itmo.soa.soabe.filter;
 
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter("*")
+// For further use
+//@WebFilter("*")
 public class CorsFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {

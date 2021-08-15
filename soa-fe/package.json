@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "./",
+  "proxy": "http://localhost:8080/soa_be_war_exploded/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
