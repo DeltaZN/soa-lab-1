@@ -25,6 +25,7 @@
         <hibernate-core.version>5.5.6.Final</hibernate-core.version>
         <postgresql.version>42.2.23</postgresql.version>
         <frontend-dir>${project.basedir}/../soa-fe</frontend-dir>
+        <lombok.version>1.18.20</lombok.version>
     </properties>
 
     <dependencies>
@@ -50,6 +51,12 @@
             <version>${postgresql.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>${junit.version}</version>
@@ -71,6 +78,7 @@
                 <version>3.3.1</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.2.0</version>
                 <executions>
