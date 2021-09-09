@@ -11,8 +11,7 @@ import javax.persistence.*;
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
-    @Column(nullable = false)
+    private int id; // в модели отсутствует
     private String name; //Поле может быть null
     private boolean cool;
 }

@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Coordinates {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private int id;
+    private int id; // в модели отсутствует
     private float x;
     @Column(columnDefinition = "REAL NOT NULL CHECK (y > -399)")
     private Float y; //Значение поля должно быть больше -399, Поле не может быть null
