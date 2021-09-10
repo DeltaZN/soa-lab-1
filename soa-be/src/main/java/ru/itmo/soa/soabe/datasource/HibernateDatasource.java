@@ -5,6 +5,9 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
+import ru.itmo.soa.soabe.entity.Car;
+import ru.itmo.soa.soabe.entity.Coordinates;
+import ru.itmo.soa.soabe.entity.HumanBeing;
 import ru.itmo.soa.soabe.entity.TestEntity;
 
 import java.util.Properties;
@@ -25,12 +28,16 @@ public class HibernateDatasource {
                 settings.put(Environment.DIALECT, "org.hibernate.dialect.PostgreSQLDialect");
 
                 settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+                settings.put(Environment.SHOW_SQL, "true");
 
-                settings.put(Environment.HBM2DDL_AUTO, "create-drop");
+                settings.put(Environment.HBM2DDL_AUTO, "create");
 
                 configuration.setProperties(settings);
 
                 configuration.addAnnotatedClass(TestEntity.class);
+                configuration.addAnnotatedClass(HumanBeing.class);
+                configuration.addAnnotatedClass(Car.class);
+                configuration.addAnnotatedClass(Coordinates.class);
 
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                         .applySettings(configuration.getProperties()).build();

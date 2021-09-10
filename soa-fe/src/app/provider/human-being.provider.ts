@@ -19,6 +19,7 @@ export interface HumanBeing {
 	name: string;
 	coordinates: Coordinates;
 	creationDate: string;
+	realHero: boolean;
 	hasToothpick: boolean;
 	impactSpeed: number;
 	soundtrackName: string;
@@ -74,7 +75,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 	const createHuman = (human: HumanBeing): Observable<Either<Error, number>> =>
 		requestAPI({
 			method: 'POST',
-			body: xmlBuilder.buildObject(human),
+			body: xmlBuilder.buildObject({ human_being: human }),
 		});
 
 	const updateHuman = (human: HumanBeing): Observable<Either<Error, void>> =>

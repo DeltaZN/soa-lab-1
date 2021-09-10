@@ -12,7 +12,7 @@ import ru.itmo.soa.soabe.service.HumanBeingService;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@WebServlet(name = "humanBeing", value = "/human-being")
+@WebServlet(name = "humanBeing", value = "/human-being/")
 public class HumanBeingServlet extends HttpServlet {
 
     private HumanBeingService service;
@@ -27,23 +27,13 @@ public class HumanBeingServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
-        PrintWriter out = response.getWriter();
-        try {
-
-        } catch (Exception e) {
-            response.sendError(500, e.getMessage());
-        }
+        service.getAllHumans(response);
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
-        PrintWriter out = response.getWriter();
-        try {
-
-        } catch (Exception e) {
-            response.sendError(500, e.getMessage());
-        }
+        service.createHuman(request, response);
     }
 
     @Override
@@ -51,7 +41,6 @@ public class HumanBeingServlet extends HttpServlet {
         response.setContentType("text/xml");
         PrintWriter out = response.getWriter();
         try {
-
         } catch (Exception e) {
             response.sendError(500, e.getMessage());
         }

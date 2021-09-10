@@ -4,14 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@XmlRootElement
 public class Car {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @XmlElement
     private int id; // в модели отсутствует
+    @XmlElement
     private String name; //Поле может быть null
+    @XmlElement
     private boolean cool;
 }

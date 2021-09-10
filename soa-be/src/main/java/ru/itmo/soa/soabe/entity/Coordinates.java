@@ -4,15 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@XmlRootElement
 public class Coordinates {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id; // в модели отсутствует
+    @XmlElement
     private float x;
-    @Column(columnDefinition = "REAL NOT NULL CHECK (y > -399)")
+    @Column(columnDefinition = "REAL NOT NULL CHECK (Coordinates.y > -399)")
+    @XmlElement
     private Float y; //Значение поля должно быть больше -399, Поле не может быть null
 }
