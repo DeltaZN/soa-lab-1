@@ -8,9 +8,13 @@ import org.hibernate.service.ServiceRegistry;
 import ru.itmo.soa.soabe.entity.Car;
 import ru.itmo.soa.soabe.entity.Coordinates;
 import ru.itmo.soa.soabe.entity.HumanBeing;
-import ru.itmo.soa.soabe.entity.TestEntity;
 
 import java.util.Properties;
+
+
+// TODO независимость от окружения
+// TODO фильтрация по полям
+// TODO пагинация
 
 public class HibernateDatasource {
     private static SessionFactory sessionFactory;
@@ -34,7 +38,6 @@ public class HibernateDatasource {
 
                 configuration.setProperties(settings);
 
-                configuration.addAnnotatedClass(TestEntity.class);
                 configuration.addAnnotatedClass(HumanBeing.class);
                 configuration.addAnnotatedClass(Car.class);
                 configuration.addAnnotatedClass(Coordinates.class);

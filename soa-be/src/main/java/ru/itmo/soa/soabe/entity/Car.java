@@ -17,6 +17,7 @@ public class Car {
     @XmlElement
     private int id; // в модели отсутствует
     @XmlElement
+    @Column(nullable = false)
     private String name; //Поле может быть null
     @XmlElement
     private boolean cool;

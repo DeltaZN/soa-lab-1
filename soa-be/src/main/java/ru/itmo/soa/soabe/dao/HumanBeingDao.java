@@ -4,8 +4,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import ru.itmo.soa.soabe.datasource.HibernateDatasource;
+import ru.itmo.soa.soabe.entity.Car;
+import ru.itmo.soa.soabe.entity.Coordinates;
 import ru.itmo.soa.soabe.entity.HumanBeing;
+import ru.itmo.soa.soabe.servlet.HumanBeingFilterParams;
 
+import javax.persistence.criteria.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,12 +76,23 @@ public class HumanBeingDao {
         return deletedId;
     }
 
-    public List<HumanBeing> getAllHumans() {
+    public List<HumanBeing> getAllHumans(HumanBeingFilterParams params) {
         Transaction transaction = null;
         List<HumanBeing> humans = List.of();
         try (Session session = HibernateDatasource.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            humans = session.createQuery("from HumanBeing").getResultList();
+
+            CriteriaBuilder cb = session.getCriteriaBuilder();
+            CriteriaQuery<HumanBeing> cr =
+                    cb.createQuery(HumanBeing.class);
+            Root<HumanBeing> root = cr.from(HumanBeing.class);
+            Join<HumanBeing, Car> join = root.join("car");
+            Join<HumanBeing, Coordinates> joinCoordinates = root.join("coordinates");
+
+            List<Predicate> predicates = params.getPredicates(cb, root, join, joinCoordinates);
+            CriteriaQuery<HumanBeing> query = cr.select(root).where(predicates.toArray(new Predicate[0]));
+            humans = session.createQuery(query).getResultList();
+
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {

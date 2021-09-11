@@ -49,6 +49,7 @@ public class HumanBeing {
     @XmlElement
     private WeaponType weaponType; //Поле не может быть null
     @OneToOne(cascade = CascadeType.ALL)
+    @Getter
     @JoinColumn(name = "car_id")
     @XmlElement
     private Car car; //Поле не может быть null

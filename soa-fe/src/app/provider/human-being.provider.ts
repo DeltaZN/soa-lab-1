@@ -28,8 +28,12 @@ export interface HumanBeing {
 	car: Car;
 }
 
+export type PCoordinates = Partial<Coordinates>;
+export type PCar = Partial<Car>;
+export type PHumanBeing = Partial<HumanBeing> & { car: PCar; coordinates: PCoordinates };
+
 export interface HumanBeingProvider {
-	getAllHumans: () => Observable<Either<Error, HumanBeing[]>>;
+	getAllHumans: (filter?: string) => Observable<Either<Error, HumanBeing[]>>;
 	getHuman: (id: number) => Observable<Either<Error, HumanBeing>>;
 	createHuman: (human: HumanBeing) => Observable<Either<Error, number>>;
 	updateHuman: (human: HumanBeing) => Observable<Either<Error, void>>;
@@ -59,10 +63,13 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 				.catch(e => left<Error>(e)),
 		);
 
-	const getAllHumans = (): Observable<Either<Error, HumanBeing[]>> =>
-		requestAPI({
-			method: 'GET',
-		});
+	const getAllHumans = (filter?: string): Observable<Either<Error, HumanBeing[]>> =>
+		requestAPI(
+			{
+				method: 'GET',
+			},
+			filter,
+		);
 
 	const getHuman = (id: number): Observable<Either<Error, HumanBeing>> =>
 		requestAPI(

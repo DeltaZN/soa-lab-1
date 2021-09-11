@@ -2,7 +2,6 @@ package ru.itmo.soa.soabe.converter;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import ru.itmo.soa.soabe.entity.TestEntity;
 
 
 class XMLConverterTest {

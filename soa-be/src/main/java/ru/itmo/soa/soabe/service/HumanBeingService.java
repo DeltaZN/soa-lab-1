@@ -6,6 +6,7 @@ import ru.itmo.soa.soabe.converter.Converter;
 import ru.itmo.soa.soabe.dao.HumanBeingDao;
 import ru.itmo.soa.soabe.entity.HumanBeing;
 import ru.itmo.soa.soabe.response.ServerResponse;
+import ru.itmo.soa.soabe.servlet.HumanBeingFilterParams;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -74,9 +75,9 @@ public class HumanBeingService {
         }
     }
 
-    public void getAllHumans(HttpServletResponse response) {
+    public void getAllHumans(HttpServletResponse response, HumanBeingFilterParams params) {
         try {
-            List<HumanBeing> humans = dao.getAllHumans();
+            List<HumanBeing> humans = dao.getAllHumans(params);
             response.setStatus(200);
             PrintWriter writer = response.getWriter();
             writer.write(converter.listToStr(humans, "humans", new HumanBeing[0]));

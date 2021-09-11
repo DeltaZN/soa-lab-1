@@ -7,6 +7,7 @@ import { pipe } from 'fp-ts/function';
 import { either, option } from 'fp-ts';
 import { createHumanBeingProvider, HumanBeing } from './provider/human-being.provider';
 import { Either } from 'fp-ts/Either';
+import { HumanBeingFilterForm } from './component/HumanBeingFilterForm/human-being-filter-form.component';
 
 const randomHuman: HumanBeing = {
 	id: 0,
@@ -20,6 +21,7 @@ const randomHuman: HumanBeing = {
 	minutesOfWaiting: 32,
 	weaponType: 'SHOTGUN',
 	car: {
+		name: 'wolkswagen',
 		cool: false,
 	},
 };
@@ -29,6 +31,7 @@ export const App = () => {
 	const provider = useMemo(() => createTestProvider(), []);
 	const humanBeingProvider = useMemo(() => createHumanBeingProvider(), []);
 	const [id, setId] = useState('');
+	const [filter, setFilter] = useState('');
 	const handleInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
 		setId(e.target.value);
 	}, []);
@@ -47,8 +50,8 @@ export const App = () => {
 	}, [provider]);
 
 	const onClickGetAllHandler = useCallback(() => {
-		humanBeingProvider.getAllHumans().subscribe(handleResult);
-	}, [provider]);
+		humanBeingProvider.getAllHumans(filter).subscribe(handleResult);
+	}, [provider, filter]);
 
 	const onClickGetByIdHandler = useCallback(() => {
 		humanBeingProvider.getHuman(parseInt(id, 10)).subscribe(handleResult);
@@ -83,6 +86,7 @@ export const App = () => {
 			<button onClick={onClickCountSoundtrackNameLess}>CountSoundtrackNameLess!</button>
 			<button onClick={onClickFindMinutesOfWaitingLess}>FindAllMinutesOfWaitingLess!</button>
 			<button onClick={onClickDeleteMinutesOfWaitingEqual}>DeleteAnyMinutesOfWaitingEqual!</button>
+			<HumanBeingFilterForm onFilterChange={setFilter} />
 			<div>
 				{pipe(
 					label,
