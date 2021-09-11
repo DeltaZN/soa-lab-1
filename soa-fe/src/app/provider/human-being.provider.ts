@@ -47,14 +47,14 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 
 	const requestAPI = (init: RequestInit, url: string = ''): Observable<Either<Error, any>> =>
 		from(
-			fetch(`${humanBeingAPI}/${url}`, init)
+			fetch(`${humanBeingAPI}${url}`, init)
 				.then(res => {
 					if (res.status === 200) {
 						return res.text();
 					}
 					throw new Error(`${res.status}: ${res.statusText}`);
 				})
-				.then(r => parseStringPromise(r, { explicitArray: false }))
+				.then(r => parseStringPromise(r, { explicitArray: false, ignoreAttrs: true }))
 				.then(data => right(data))
 				.catch(e => left<Error>(e)),
 		);
@@ -69,7 +69,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			{
 				method: 'GET',
 			},
-			`${id}`,
+			`/${id}`,
 		);
 
 	const createHuman = (human: HumanBeing): Observable<Either<Error, number>> =>
@@ -81,7 +81,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 	const updateHuman = (human: HumanBeing): Observable<Either<Error, void>> =>
 		requestAPI({
 			method: 'PUT',
-			body: xmlBuilder.buildObject(human),
+			body: xmlBuilder.buildObject({ human_being: human }),
 		});
 
 	const deleteHuman = (id: number): Observable<Either<Error, void>> =>
@@ -89,7 +89,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			{
 				method: 'DELETE',
 			},
-			`${id}`,
+			`/${id}`,
 		);
 
 	const deleteAnyMinutesOfWaitingEqual = (minutesOfWaiting: number): Observable<Either<Error, void>> =>
@@ -97,7 +97,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			{
 				method: 'DELETE',
 			},
-			`minutesOfWaiting=${minutesOfWaiting}`,
+			`?minutesOfWaiting=${minutesOfWaiting}`,
 		);
 
 	const countAllSoundtrackNameLess = (soundtrackName: string): Observable<Either<Error, number>> =>
@@ -105,7 +105,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			{
 				method: 'POST',
 			},
-			`soundtrackNameLess=${soundtrackName}`,
+			`/count?soundtrackNameLess=${soundtrackName}`,
 		);
 
 	const findAllMinutesOfWaitingLess = (minutesOfWaiting: number): Observable<Either<Error, HumanBeing[]>> =>
@@ -113,7 +113,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			{
 				method: 'GET',
 			},
-			`minutesOfWaitingLess=${minutesOfWaiting}`,
+			`?minutesOfWaitingLess=${minutesOfWaiting}`,
 		);
 
 	return {

@@ -1,6 +1,7 @@
 package ru.itmo.soa.soabe.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ public class HumanBeing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @XmlElement
+    @Getter
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     @Column(columnDefinition = "TEXT NOT NULL CHECK (char_length(human_being.name) > 0)")
     @XmlElement

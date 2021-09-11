@@ -10,10 +10,13 @@ import ru.itmo.soa.soabe.converter.XMLConverter;
 import ru.itmo.soa.soabe.service.HumanBeingService;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
-@WebServlet(name = "humanBeing", value = "/human-being/")
+@WebServlet(name = "humanBeing", value = "/human-being/*")
 public class HumanBeingServlet extends HttpServlet {
+
+    private static final String SOUNDTRACK_NAME_LESS_PARAM = "soundtrackNameLess";
+    private static final String MINUTES_OF_WAITING_LESS_PARAM = "minutesOfWaitingLess";
+    private static final String MINUTES_OF_WAITING_PARAM = "minutesOfWaiting";
 
     private HumanBeingService service;
 
@@ -27,33 +30,59 @@ public class HumanBeingServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
-        service.getAllHumans(response);
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            String minutesOfWaitingLess = request.getParameter(MINUTES_OF_WAITING_LESS_PARAM);
+            if (minutesOfWaitingLess != null) {
+                service.findMinutesOfWaitingLess(response, Long.parseLong(minutesOfWaitingLess));
+            } else {
+                service.getAllHumans(response);
+            }
+        } else {
+            String[] servletPath = pathInfo.split("/");
+            if (servletPath.length > 1) {
+                String id = servletPath[1];
+                service.getHuman(response, Integer.parseInt(id));
+            }
+        }
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
-        service.createHuman(request, response);
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            service.createHuman(request, response);
+        } else {
+            String[] servletPath = pathInfo.split("/");
+            if (servletPath.length > 1) {
+                String soundTrackName = request.getParameter(SOUNDTRACK_NAME_LESS_PARAM);
+                service.countSoundtrackNameLess(response, soundTrackName);
+            }
+        }
     }
 
     @Override
     public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
-        PrintWriter out = response.getWriter();
-        try {
-        } catch (Exception e) {
-            response.sendError(500, e.getMessage());
-        }
+        service.updateHuman(request, response);
     }
 
     @Override
     public void doDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
-        PrintWriter out = response.getWriter();
-        try {
-
-        } catch (Exception e) {
-            response.sendError(500, e.getMessage());
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            String minutesOfWaiting = request.getParameter(MINUTES_OF_WAITING_PARAM);
+            if (minutesOfWaiting != null) {
+                service.deleteAnyMinutesOfWaitingEqual(response, Integer.parseInt(minutesOfWaiting));
+            }
+        } else {
+            String[] servletPath = pathInfo.split("/");
+            if (servletPath.length > 1) {
+                String id = servletPath[1];
+                service.deleteHuman(response, Integer.parseInt(id));
+            }
         }
     }
 }

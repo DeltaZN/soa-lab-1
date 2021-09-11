@@ -2,12 +2,12 @@ package ru.itmo.soa.soabe.converter;
 
 import javax.xml.bind.*;
 import javax.xml.namespace.QName;
-import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
 
 public class XMLConverter implements Converter {
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public <T> String listToStr(List<T> list, String name, T[] array) {
         try {
             JAXBContext jc = JAXBContext.newInstance(array.getClass());

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import '../App.css';
 import { AppContainer } from './App.styled';
 import { createTestProvider } from './provider/test.provider';
@@ -6,9 +6,7 @@ import { none, Option, some } from 'fp-ts/Option';
 import { pipe } from 'fp-ts/function';
 import { either, option } from 'fp-ts';
 import { createHumanBeingProvider, HumanBeing } from './provider/human-being.provider';
-
-// For further use
-// export const BASE_URL = `${process.env.PUBLIC_URL || 'http://localhost:8080/soa_be_war_exploded'}`;
+import { Either } from 'fp-ts/Either';
 
 const randomHuman: HumanBeing = {
 	id: 0,
@@ -30,32 +28,61 @@ export const App = () => {
 	const [label, setLabel] = useState<Option<string>>(none);
 	const provider = useMemo(() => createTestProvider(), []);
 	const humanBeingProvider = useMemo(() => createHumanBeingProvider(), []);
+	const [id, setId] = useState('');
+	const handleInput = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		setId(e.target.value);
+	}, []);
+
+	const handleResult = (res: Either<Error, any>) =>
+		pipe(
+			res,
+			either.fold(
+				e => setLabel(some(e.toString())),
+				data => setLabel(some(JSON.stringify(data))),
+			),
+		);
+
 	const onClickCreateHandler = useCallback(() => {
-		humanBeingProvider.createHuman(randomHuman).subscribe(res =>
-			pipe(
-				res,
-				either.fold(
-					e => setLabel(some(e.toString())),
-					data => setLabel(some(JSON.stringify(data))),
-				),
-			),
-		);
+		humanBeingProvider.createHuman(randomHuman).subscribe(handleResult);
 	}, [provider]);
+
 	const onClickGetAllHandler = useCallback(() => {
-		humanBeingProvider.getAllHumans().subscribe(res =>
-			pipe(
-				res,
-				either.fold(
-					e => setLabel(some(e.toString())),
-					data => setLabel(some(JSON.stringify(data))),
-				),
-			),
-		);
+		humanBeingProvider.getAllHumans().subscribe(handleResult);
 	}, [provider]);
+
+	const onClickGetByIdHandler = useCallback(() => {
+		humanBeingProvider.getHuman(parseInt(id, 10)).subscribe(handleResult);
+	}, [provider, id]);
+
+	const onClickDeleteByIdHandler = useCallback(() => {
+		humanBeingProvider.deleteHuman(parseInt(id, 10)).subscribe(handleResult);
+	}, [provider, id]);
+
+	const onClickCountSoundtrackNameLess = useCallback(() => {
+		humanBeingProvider.countAllSoundtrackNameLess(id).subscribe(handleResult);
+	}, [provider, id]);
+
+	const onClickFindMinutesOfWaitingLess = useCallback(() => {
+		humanBeingProvider.findAllMinutesOfWaitingLess(parseInt(id, 10)).subscribe(handleResult);
+	}, [provider, id]);
+
+	const onClickDeleteMinutesOfWaitingEqual = useCallback(() => {
+		humanBeingProvider.deleteAnyMinutesOfWaitingEqual(parseInt(id, 10)).subscribe(handleResult);
+	}, [provider, id]);
+
 	return (
 		<AppContainer>
+			<div>
+				<label>ID</label>
+				<input onChange={handleInput} value={id} />
+			</div>
 			<button onClick={onClickCreateHandler}>TestCreate!</button>
 			<button onClick={onClickGetAllHandler}>GetAll!</button>
+			<button onClick={onClickGetByIdHandler}>GetId!</button>
+			<button onClick={onClickDeleteByIdHandler}>DeleteId!</button>
+			<button onClick={onClickCountSoundtrackNameLess}>CountSoundtrackNameLess!</button>
+			<button onClick={onClickFindMinutesOfWaitingLess}>FindAllMinutesOfWaitingLess!</button>
+			<button onClick={onClickDeleteMinutesOfWaitingEqual}>DeleteAnyMinutesOfWaitingEqual!</button>
 			<div>
 				{pipe(
 					label,
