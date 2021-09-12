@@ -7,4 +7,8 @@
         <error-code>404</error-code>
         <location>/index.html</location>
     </error-page>
+    <error-page>
+        <exception-type>java.lang.NumberFormatException</exception-type>
+        <location>/errorHandler</location>
+    </error-page>
 </web-app>

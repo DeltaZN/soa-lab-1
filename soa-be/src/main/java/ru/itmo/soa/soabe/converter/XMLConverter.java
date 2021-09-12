@@ -40,7 +40,17 @@ public class XMLConverter implements Converter {
     }
 
     @Override
-    public <T> T fromStr(String str, Class<T> tClass) {
-        return JAXB.unmarshal(new StringReader(str), tClass);
+    public <T> T fromStr(String str, Class<T> tClass) throws JAXBException {
+        JAXBContext jc = JAXBContext.newInstance(tClass);
+
+        Unmarshaller unmarshaller = jc.createUnmarshaller();
+        unmarshaller.setEventHandler(event -> {
+            if (event.getLinkedException() instanceof NumberFormatException) {
+                throw new NumberFormatException(String.format("Cannot parse - %s", event.getMessage()));
+            }
+            return false;
+        });
+
+        return (T) unmarshaller.unmarshal(new StringReader(str));
     }
 }

@@ -37,7 +37,7 @@ public class HumanBeing {
     @XmlElement
     private boolean hasToothpick;
     @Column(name = "impact_speed", columnDefinition = "BIGINT CHECK (human_being.impact_speed < 333)")
-    @XmlElement
+    @XmlElement(required = true)
     private long impactSpeed; //Максимальное значение поля: 333
     @Column(nullable = false, name = "soundtrack_name")
     @XmlElement

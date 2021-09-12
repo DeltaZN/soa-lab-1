@@ -1,6 +1,8 @@
-import { from, Observable } from 'rxjs';
+import { from, map, Observable } from 'rxjs';
 import { Builder, parseStringPromise } from 'xml2js';
 import { Either, left, right } from 'fp-ts/Either';
+import { pipe } from 'fp-ts/function';
+import { array, either, option } from 'fp-ts';
 
 export interface Car {
 	name?: string;
@@ -12,7 +14,9 @@ export interface Coordinates {
 	y: number;
 }
 
-export type WeaponType = 'HAMMER' | 'AXE' | 'SHOTGUN' | 'KNIFE';
+export const ALL_WEAPONS = ['HAMMER', 'AXE', 'SHOTGUN', 'KNIFE'] as const;
+
+export type WeaponType = typeof ALL_WEAPONS[number];
 
 export interface HumanBeing {
 	id: number;
@@ -28,12 +32,19 @@ export interface HumanBeing {
 	car: Car;
 }
 
+export interface PaginationResult {
+	readonly totalPages: number;
+	readonly currentPage: number;
+	readonly totalItems: number;
+	readonly humans: HumanBeing[];
+}
+
 export type PCoordinates = Partial<Coordinates>;
 export type PCar = Partial<Car>;
 export type PHumanBeing = Partial<HumanBeing> & { car: PCar; coordinates: PCoordinates };
 
 export interface HumanBeingProvider {
-	getAllHumans: (filter?: string) => Observable<Either<Error, HumanBeing[]>>;
+	getAllHumans: (params?: string) => Observable<Either<Error, PaginationResult>>;
 	getHuman: (id: number) => Observable<Either<Error, HumanBeing>>;
 	createHuman: (human: HumanBeing) => Observable<Either<Error, number>>;
 	updateHuman: (human: HumanBeing) => Observable<Either<Error, void>>;
@@ -56,19 +67,50 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 					if (res.status === 200) {
 						return res.text();
 					}
-					throw new Error(`${res.status}: ${res.statusText}`);
+					return res.text().then(text => {
+						throw new Error(`${res.statusText}: ${text}`);
+					});
 				})
 				.then(r => parseStringPromise(r, { explicitArray: false, ignoreAttrs: true }))
 				.then(data => right(data))
 				.catch(e => left<Error>(e)),
 		);
 
-	const getAllHumans = (filter?: string): Observable<Either<Error, HumanBeing[]>> =>
+	const getAllHumans = (params?: string): Observable<Either<Error, PaginationResult>> =>
 		requestAPI(
 			{
 				method: 'GET',
 			},
-			filter,
+			params,
+		).pipe(
+			map(e =>
+				pipe(
+					e,
+					either.map(d => ({
+						totalPages: parseInt(d.pagination_result.totalPages, 10),
+						currentPage: parseInt(d.pagination_result.currentPage, 10),
+						totalItems: parseInt(d.pagination_result.totalItems, 10),
+						humans: pipe(
+							option.fromNullable(d.pagination_result.humans),
+							option.chain(data => option.fromNullable(data.human)),
+							option.map(data => (Array.isArray(data) ? data : [data])),
+							option.getOrElse<HumanBeing[]>(() => []),
+							array.map(human => ({
+								...human,
+								// @ts-ignore
+								hasToothpick: human.hasToothpick === 'true',
+								// @ts-ignore
+								realHero: human.realHero === 'true',
+								car: {
+									...human.car,
+									// @ts-ignore
+									cool: human.car.cool === 'true',
+								},
+							})),
+						),
+					})),
+				),
+			),
 		);
 
 	const getHuman = (id: number): Observable<Either<Error, HumanBeing>> =>

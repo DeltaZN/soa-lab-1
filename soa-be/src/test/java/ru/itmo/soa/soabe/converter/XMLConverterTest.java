@@ -3,6 +3,8 @@ package ru.itmo.soa.soabe.converter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.xml.bind.JAXBException;
+
 
 class XMLConverterTest {
 
@@ -22,7 +24,7 @@ class XMLConverterTest {
     }
 
     @Test
-    void fromStr() {
+    void fromStr() throws JAXBException {
         XMLConverter xmlConverter = new XMLConverter();
         TestEntity testEntity = new TestEntity(1);
         TestEntity parsed = xmlConverter.fromStr(str, TestEntity.class);

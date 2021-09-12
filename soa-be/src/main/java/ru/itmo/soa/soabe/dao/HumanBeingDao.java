@@ -1,5 +1,7 @@
 package ru.itmo.soa.soabe.dao;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -7,9 +9,12 @@ import ru.itmo.soa.soabe.datasource.HibernateDatasource;
 import ru.itmo.soa.soabe.entity.Car;
 import ru.itmo.soa.soabe.entity.Coordinates;
 import ru.itmo.soa.soabe.entity.HumanBeing;
-import ru.itmo.soa.soabe.servlet.HumanBeingFilterParams;
+import ru.itmo.soa.soabe.servlet.HumanBeingRequestParams;
 
 import javax.persistence.criteria.*;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.util.List;
 import java.util.Optional;
 
@@ -76,9 +81,38 @@ public class HumanBeingDao {
         return deletedId;
     }
 
-    public List<HumanBeing> getAllHumans(HumanBeingFilterParams params) {
+    @Data
+    @AllArgsConstructor
+    @XmlRootElement(name = "pagination_result")
+    public static class PaginationResult {
+        @XmlElement
+        private final int totalPages;
+        @XmlElement
+        private final int currentPage;
+        @XmlElement
+        private final long totalItems;
+        @XmlElementWrapper(name="humans")
+        @XmlElement(name="human")
+        private final List<HumanBeing> list;
+        public PaginationResult() {
+            totalPages = 0;
+            currentPage = 0;
+            totalItems = 0;
+            list = List.of();
+        }
+    }
+
+    private void applyPagination(Query<HumanBeing> typedQuery, HumanBeingRequestParams params) {
+        int pageIndex = params.pageIdx;
+        int numberOfRecordsPerPage = params.pageSize;
+        int startIndex = (pageIndex * numberOfRecordsPerPage) - numberOfRecordsPerPage;
+        typedQuery.setFirstResult(startIndex);
+        typedQuery.setMaxResults(numberOfRecordsPerPage);
+    }
+
+    public PaginationResult getAllHumans(HumanBeingRequestParams params) {
         Transaction transaction = null;
-        List<HumanBeing> humans = List.of();
+        PaginationResult res = new PaginationResult();
         try (Session session = HibernateDatasource.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
@@ -90,8 +124,24 @@ public class HumanBeingDao {
             Join<HumanBeing, Coordinates> joinCoordinates = root.join("coordinates");
 
             List<Predicate> predicates = params.getPredicates(cb, root, join, joinCoordinates);
+            if (params.sorting != null) {
+                cr.orderBy(cb.asc(root.get(params.sorting)));
+            }
+
             CriteriaQuery<HumanBeing> query = cr.select(root).where(predicates.toArray(new Predicate[0]));
-            humans = session.createQuery(query).getResultList();
+            Query<HumanBeing> typedQuery = session.createQuery(query);
+            applyPagination(typedQuery, params);
+
+            CriteriaQuery<Long> countQuery = cb
+                    .createQuery(Long.class);
+            countQuery.select(cb
+                    .count(countQuery.from(HumanBeing.class)));
+            Long count = session.createQuery(countQuery)
+                    .getSingleResult();
+
+            List<HumanBeing> list = typedQuery.getResultList();
+
+            res = new PaginationResult((int) (count / params.pageSize) + 1, params.pageIdx, count, list);
 
             transaction.commit();
         } catch (Exception e) {
@@ -100,7 +150,7 @@ public class HumanBeingDao {
             }
             e.printStackTrace();
         }
-        return humans;
+        return res;
     }
 
     public Optional<HumanBeing> getHuman(int id) {

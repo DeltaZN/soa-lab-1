@@ -11,7 +11,7 @@ import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HumanBeingFilterParams {
+public class HumanBeingRequestParams {
     public final String name;
     public final Long minutesOfWaiting;
     public final Boolean realHero;
@@ -24,8 +24,11 @@ public class HumanBeingFilterParams {
     public final Float coordinatesX;
     public final Float coordinatesY;
     public final String creationDate;
+    public final String sorting;
+    public final int pageIdx;
+    public final int pageSize;
 
-    HumanBeingFilterParams(
+    HumanBeingRequestParams(
             String name,
             String minutesOfWaiting,
             String realHero,
@@ -37,8 +40,12 @@ public class HumanBeingFilterParams {
             String carCool,
             String coordinatesX,
             String coordinatesY,
-            String creationDate
+            String creationDate,
+            String sorting,
+            String pageIdx,
+            String pageSize
     ) {
+        this.sorting = sorting;
         this.name = name;
         this.minutesOfWaiting = minutesOfWaiting == null ? null : Long.parseLong(minutesOfWaiting);
         this.realHero = realHero == null ? null : Boolean.parseBoolean(realHero);
@@ -51,6 +58,12 @@ public class HumanBeingFilterParams {
         this.coordinatesX = coordinatesX == null ? null : Float.parseFloat(coordinatesX);
         this.coordinatesY = coordinatesY == null ? null : Float.parseFloat(coordinatesY);
         this.creationDate = creationDate;
+        this.pageIdx = pageIdx == null ? 1 : Integer.parseInt(pageIdx);
+        this.pageSize = pageSize == null ? 5 : Integer.parseInt(pageSize);
+    }
+
+    private String like(String val) {
+        return "%" + val + "%";
     }
 
     public List<javax.persistence.criteria.Predicate> getPredicates(
@@ -61,7 +74,7 @@ public class HumanBeingFilterParams {
     ) {
         List<javax.persistence.criteria.Predicate> predicates = new ArrayList<>();
         if (name != null) {
-            predicates.add(cb.equal(root.get("name"), name));
+            predicates.add(cb.like(root.get("name"), like(name)));
         }
         if (minutesOfWaiting != null) {
             predicates.add(cb.equal(root.get("minutesOfWaiting"), minutesOfWaiting));
@@ -76,13 +89,13 @@ public class HumanBeingFilterParams {
             predicates.add(cb.equal(root.get("impactSpeed"), impactSpeed));
         }
         if (soundtrackName != null) {
-            predicates.add(cb.equal(root.get("soundtrackName"), soundtrackName));
+            predicates.add(cb.like(root.get("soundtrackName"), like(soundtrackName)));
         }
         if (weaponType != null) {
             predicates.add(cb.equal(root.get("weaponType"), weaponType));
         }
         if (carName != null) {
-            predicates.add(cb.equal(join.get("name"), carName));
+            predicates.add(cb.like(join.get("name"), like(carName)));
         }
         if (carCool != null) {
             predicates.add(cb.equal(join.get("cool"), carCool));

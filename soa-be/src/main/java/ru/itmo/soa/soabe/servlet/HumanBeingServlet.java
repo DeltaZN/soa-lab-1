@@ -5,14 +5,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.SneakyThrows;
 import ru.itmo.soa.soabe.converter.Converter;
 import ru.itmo.soa.soabe.converter.XMLConverter;
 import ru.itmo.soa.soabe.service.HumanBeingService;
 
-import java.io.IOException;
-
 @WebServlet(name = "humanBeing", value = "/human-being/*")
 public class HumanBeingServlet extends HttpServlet {
+
+    private static final String SORTING_PARAM = "sort";
+    private static final String PAGE_IDX_PARAM = "pageIdx";
+    private static final String PAGE_SIZE_PARAM = "pageSize";
 
     private static final String SOUNDTRACK_NAME_LESS_PARAM = "soundtrackNameLess";
     private static final String MINUTES_OF_WAITING_LESS_PARAM = "minutesOfWaitingLess";
@@ -39,20 +42,23 @@ public class HumanBeingServlet extends HttpServlet {
         service = new HumanBeingService(converter);
     }
 
-    private HumanBeingFilterParams getFilterParams(HttpServletRequest request) {
-       return new HumanBeingFilterParams(
-                request.getParameter(NAME_PARAM),
-                request.getParameter(MINUTES_OF_WAITING_PARAM),
-                request.getParameter(REAL_HERO_PARAM),
-                request.getParameter(HAS_TOOTHPICK_PARAM),
-                request.getParameter(IMPACT_SPEED_PARAM),
-                request.getParameter(SOUNDTRACK_NAME_PARAM),
-                request.getParameter(WEAPON_TYPE_PARAM),
-                request.getParameter(CAR_NAME_PARAM),
-                request.getParameter(CAR_COOL_PARAM),
-                request.getParameter(COORDINATES_X_PARAM),
-                request.getParameter(COORDINATES_Y_PARAM),
-                request.getParameter(CREATION_DATE_PARAM)
+    private HumanBeingRequestParams getFilterParams(HttpServletRequest request) {
+       return new HumanBeingRequestParams(
+               request.getParameter(NAME_PARAM),
+               request.getParameter(MINUTES_OF_WAITING_PARAM),
+               request.getParameter(REAL_HERO_PARAM),
+               request.getParameter(HAS_TOOTHPICK_PARAM),
+               request.getParameter(IMPACT_SPEED_PARAM),
+               request.getParameter(SOUNDTRACK_NAME_PARAM),
+               request.getParameter(WEAPON_TYPE_PARAM),
+               request.getParameter(CAR_NAME_PARAM),
+               request.getParameter(CAR_COOL_PARAM),
+               request.getParameter(COORDINATES_X_PARAM),
+               request.getParameter(COORDINATES_Y_PARAM),
+               request.getParameter(CREATION_DATE_PARAM),
+               request.getParameter(SORTING_PARAM),
+               request.getParameter(PAGE_IDX_PARAM),
+               request.getParameter(PAGE_SIZE_PARAM)
         );
     }
 
@@ -61,7 +67,7 @@ public class HumanBeingServlet extends HttpServlet {
         response.setContentType("text/xml");
         String pathInfo = request.getPathInfo();
         if (pathInfo == null) {
-            HumanBeingFilterParams filterParams = getFilterParams(request);
+            HumanBeingRequestParams filterParams = getFilterParams(request);
             String minutesOfWaitingLess = request.getParameter(MINUTES_OF_WAITING_LESS_PARAM);
             if (minutesOfWaitingLess != null) {
                 service.findMinutesOfWaitingLess(response, Long.parseLong(minutesOfWaitingLess));
@@ -78,7 +84,7 @@ public class HumanBeingServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/xml");
         String pathInfo = request.getPathInfo();
         if (pathInfo == null) {
@@ -92,8 +98,9 @@ public class HumanBeingServlet extends HttpServlet {
         }
     }
 
+    @SneakyThrows
     @Override
-    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/xml");
         service.updateHuman(request, response);
     }
