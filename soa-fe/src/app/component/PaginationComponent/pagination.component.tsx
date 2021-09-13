@@ -1,7 +1,8 @@
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, memo, useCallback, useEffect, useState } from 'react';
 import { HumanBeing, PaginationResult } from '../../provider/human-being.provider';
 import { PageN } from './pagination.styled';
 import { HumanBeingTable } from '../HumanBeingTable/human-being-table.component';
+import { HDiv } from '../common.styled';
 
 export interface PaginationSettings {
 	readonly currentPage: number;
@@ -43,6 +44,13 @@ export const Pagination = memo<PaginationProps>(props => {
 		[pagination],
 	);
 
+	const changePageSize = useCallback(
+		(size: number) => {
+			setPagination({ ...pagination, pageSize: size });
+		},
+		[pagination],
+	);
+
 	useEffect(() => {
 		updatePagination(`pageIdx=${pagination.currentPage}&pageSize=${pagination.pageSize}`);
 	}, [pagination]);
@@ -50,16 +58,32 @@ export const Pagination = memo<PaginationProps>(props => {
 	return (
 		<div>
 			<HumanBeingTable humans={paginationResult.humans} onSave={updateHuman} />
-			<div>
+			<HDiv>
 				{getPageNumeration(paginationResult, selectPage)}
-				<PageSizeSelector />
-			</div>
+				<PageSizeSelector options={[5, 10, 25]} onOptionChange={changePageSize} />
+			</HDiv>
 		</div>
 	);
 });
 
-interface PageSizeSelectorProps {}
+interface PageSizeSelectorProps {
+	readonly options: number[];
+	readonly onOptionChange: (option: number) => void;
+}
 
 const PageSizeSelector = memo<PageSizeSelectorProps>(props => {
-	return <div />;
+	const { options, onOptionChange } = props;
+	const handleChange = useCallback((e: ChangeEvent<HTMLSelectElement>) => {
+		onOptionChange(parseInt(e.target.value, 10));
+	}, []);
+	return (
+		<div>
+			<span>| Page size: </span>
+			<select onChange={handleChange}>
+				{options.map(o => (
+					<option key={o}>{o}</option>
+				))}
+			</select>
+		</div>
+	);
 });

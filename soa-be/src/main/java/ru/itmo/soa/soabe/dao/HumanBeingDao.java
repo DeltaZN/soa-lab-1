@@ -125,7 +125,13 @@ public class HumanBeingDao {
 
             List<Predicate> predicates = params.getPredicates(cb, root, join, joinCoordinates);
             if (params.sorting != null) {
-                cr.orderBy(cb.asc(root.get(params.sorting)));
+                if (params.sorting.startsWith("coordinates")) {
+                    cr.orderBy(cb.asc(joinCoordinates.get(params.sorting.replaceAll("coordinates", "").toLowerCase())));
+                } else if (params.sorting.startsWith("car")) {
+                    cr.orderBy(cb.asc(join.get(params.sorting.replaceAll("car", "").toLowerCase())));
+                } else {
+                    cr.orderBy(cb.asc(root.get(params.sorting)));
+                }
             }
 
             CriteriaQuery<HumanBeing> query = cr.select(root).where(predicates.toArray(new Predicate[0]));
@@ -190,17 +196,18 @@ public class HumanBeingDao {
         return successful;
     }
 
-    public void createHuman(HumanBeing human) {
+    public int createHuman(HumanBeing human) {
         Transaction transaction = null;
         try (Session session = HibernateDatasource.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.save(human);
             transaction.commit();
+            return human.getId();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -214,7 +221,7 @@ public class HumanBeingDao {
             if (transaction != null) {
                 transaction.rollback();
             }
-            e.printStackTrace();
+            throw e;
         }
     }
 }

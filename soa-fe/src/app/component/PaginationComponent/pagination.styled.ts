@@ -12,3 +12,7 @@ export const PageN = styled.span<PageNProps>`
 	}
 	user-select: none;
 `;
+
+export const PageSizeSelectorContainer = styled.div`
+	float: right;
+`;

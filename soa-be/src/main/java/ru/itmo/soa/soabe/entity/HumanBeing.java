@@ -3,10 +3,14 @@ package ru.itmo.soa.soabe.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import ru.itmo.soa.soabe.converter.ZonedDateTimeAdapter;
+import ru.itmo.soa.soabe.entity.data.HumanData;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,8 +32,9 @@ public class HumanBeing {
     private Coordinates coordinates; //Поле не может быть null
     @Column(nullable = false, name = "creation_date")
     @XmlElement
-//    java.time.ZonedDateTime
-    private String creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    @XmlJavaTypeAdapter(ZonedDateTimeAdapter.class)
+    @Getter
+    private java.time.ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     @Column(nullable = false, name = "real_hero")
     @XmlElement
     private Boolean realHero; //Поле не может быть null
@@ -53,4 +58,16 @@ public class HumanBeing {
     @JoinColumn(name = "car_id")
     @XmlElement
     private Car car; //Поле не может быть null
+
+    public void update(HumanData data) {
+        this.name = data.getName();
+        this.car.update(data.getCar());
+        this.coordinates.update(data.getCoordinates());
+        this.hasToothpick = data.getHasToothpick();
+        this.impactSpeed = data.getImpactSpeed();
+        this.minutesOfWaiting = data.getMinutesOfWaiting();
+        this.realHero = data.getRealHero();
+        this.soundtrackName = data.getSoundtrackName();
+        this.weaponType = data.getWeaponType();
+    }
 }

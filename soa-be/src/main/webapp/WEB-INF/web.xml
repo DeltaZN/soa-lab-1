@@ -11,4 +11,12 @@
         <exception-type>java.lang.NumberFormatException</exception-type>
         <location>/errorHandler</location>
     </error-page>
+    <error-page>
+        <exception-type>javax.persistence.PersistenceException</exception-type>
+        <location>/errorHandler</location>
+    </error-page>
+    <error-page>
+        <exception-type>javax.xml.bind.ValidationException</exception-type>
+        <location>/errorHandler</location>
+    </error-page>
 </web-app>

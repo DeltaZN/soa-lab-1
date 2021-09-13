@@ -50,7 +50,7 @@ export interface HumanBeingProvider {
 	updateHuman: (human: HumanBeing) => Observable<Either<Error, void>>;
 	deleteHuman: (id: number) => Observable<Either<Error, void>>;
 	// var-specific methods
-	deleteAnyMinutesOfWaitingEqual: (minutesOfWaiting: number) => Observable<Either<Error, void>>;
+	deleteAnyMinutesOfWaitingEqual: (minutesOfWaiting: number) => Observable<Either<Error, number>>;
 	countAllSoundtrackNameLess: (soundtrackName: string) => Observable<Either<Error, number>>;
 	findAllMinutesOfWaitingLess: (minutesOfWaiting: number) => Observable<Either<Error, HumanBeing[]>>;
 }
@@ -119,13 +119,50 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 				method: 'GET',
 			},
 			`/${id}`,
+		).pipe(
+			map(e =>
+				pipe(
+					e,
+					either.map(d =>
+						pipe(
+							option.fromNullable(d.human_being),
+							option.map(human => ({
+								...human,
+								// @ts-ignore
+								hasToothpick: human.hasToothpick === 'true',
+								// @ts-ignore
+								realHero: human.realHero === 'true',
+								car: {
+									...human.car,
+									// @ts-ignore
+									cool: human.car.cool === 'true',
+								},
+							})),
+							option.getOrElse(() => emptyHuman),
+						),
+					),
+				),
+			),
 		);
 
 	const createHuman = (human: HumanBeing): Observable<Either<Error, number>> =>
 		requestAPI({
 			method: 'POST',
 			body: xmlBuilder.buildObject({ human_being: human }),
-		});
+		}).pipe(
+			map(e =>
+				pipe(
+					e,
+					either.map(d =>
+						pipe(
+							option.fromNullable(d.server_response),
+							option.map(response => response.body),
+							option.getOrElse<number>(() => 0),
+						),
+					),
+				),
+			),
+		);
 
 	const updateHuman = (human: HumanBeing): Observable<Either<Error, void>> =>
 		requestAPI({
@@ -141,12 +178,25 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			`/${id}`,
 		);
 
-	const deleteAnyMinutesOfWaitingEqual = (minutesOfWaiting: number): Observable<Either<Error, void>> =>
+	const deleteAnyMinutesOfWaitingEqual = (minutesOfWaiting: number): Observable<Either<Error, number>> =>
 		requestAPI(
 			{
 				method: 'DELETE',
 			},
 			`?minutesOfWaiting=${minutesOfWaiting}`,
+		).pipe(
+			map(e =>
+				pipe(
+					e,
+					either.map(d =>
+						pipe(
+							option.fromNullable(d.server_response),
+							option.map(response => response.body),
+							option.getOrElse<number>(() => 0),
+						),
+					),
+				),
+			),
 		);
 
 	const countAllSoundtrackNameLess = (soundtrackName: string): Observable<Either<Error, number>> =>
@@ -155,6 +205,19 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 				method: 'POST',
 			},
 			`/count?soundtrackNameLess=${soundtrackName}`,
+		).pipe(
+			map(e =>
+				pipe(
+					e,
+					either.map(d =>
+						pipe(
+							option.fromNullable(d.server_response),
+							option.map(response => response.body),
+							option.getOrElse<number>(() => 0),
+						),
+					),
+				),
+			),
 		);
 
 	const findAllMinutesOfWaitingLess = (minutesOfWaiting: number): Observable<Either<Error, HumanBeing[]>> =>
@@ -163,6 +226,32 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 				method: 'GET',
 			},
 			`?minutesOfWaitingLess=${minutesOfWaiting}`,
+		).pipe(
+			map(e =>
+				pipe(
+					e,
+					either.map(d =>
+						pipe(
+							option.fromNullable(d.humans),
+							option.chain(data => option.fromNullable(data.item)),
+							option.map(data => (Array.isArray(data) ? data : [data])),
+							option.getOrElse<HumanBeing[]>(() => []),
+							array.map(human => ({
+								...human,
+								// @ts-ignore
+								hasToothpick: human.hasToothpick === 'true',
+								// @ts-ignore
+								realHero: human.realHero === 'true',
+								car: {
+									...human.car,
+									// @ts-ignore
+									cool: human.car.cool === 'true',
+								},
+							})),
+						),
+					),
+				),
+			),
 		);
 
 	return {
@@ -175,4 +264,21 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 		countAllSoundtrackNameLess,
 		findAllMinutesOfWaitingLess,
 	};
+};
+
+export const emptyHuman: HumanBeing = {
+	id: 0,
+	name: '',
+	coordinates: { x: 0, y: 0 },
+	creationDate: '',
+	hasToothpick: false,
+	realHero: false,
+	impactSpeed: 0,
+	soundtrackName: '',
+	minutesOfWaiting: 0,
+	weaponType: 'AXE',
+	car: {
+		name: '',
+		cool: false,
+	},
 };

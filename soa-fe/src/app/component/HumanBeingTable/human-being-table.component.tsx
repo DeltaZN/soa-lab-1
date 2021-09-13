@@ -5,10 +5,11 @@ import { RowTextInput } from './human-being-table.styled';
 export interface HumanBeingTableProps {
 	readonly humans: HumanBeing[];
 	readonly onSave: (val: HumanBeing) => void;
+	readonly editable?: boolean;
 }
 
 export const HumanBeingTable = memo<HumanBeingTableProps>(props => {
-	const { humans, onSave } = props;
+	const { humans, onSave, editable = true } = props;
 	return humans.length ? (
 		<table>
 			<thead>
@@ -30,7 +31,7 @@ export const HumanBeingTable = memo<HumanBeingTableProps>(props => {
 			</thead>
 			<tbody>
 				{humans.map(human => (
-					<TableRow onSave={onSave} human={human} key={human.id} />
+					<TableRow onSave={onSave} human={human} key={human.id} editable={editable} />
 				))}
 			</tbody>
 		</table>
@@ -42,14 +43,15 @@ export const HumanBeingTable = memo<HumanBeingTableProps>(props => {
 interface HumanBeingRowProps {
 	readonly human: HumanBeing;
 	readonly onSave: (val: HumanBeing) => void;
+	readonly editable: boolean;
 }
 
-type KeysOfType<T, KT> = {
+export type KeysOfType<T, KT> = {
 	[K in keyof T]: T[K] extends KT ? K : never;
 }[keyof T];
 
 const TableRow = memo<HumanBeingRowProps>(props => {
-	const { human, onSave } = props;
+	const { human, onSave, editable } = props;
 	const [state, setState] = useState<HumanBeing>(human);
 	const [isEdit, setIsEdit] = useState<boolean>(false);
 
@@ -118,11 +120,7 @@ const TableRow = memo<HumanBeingRowProps>(props => {
 				)}
 			</td>
 			<td>
-				{isEdit ? (
-					<RowTextInput value={state.creationDate} onChange={handleTextHumanChange('creationDate')} />
-				) : (
-					<div>{state.creationDate}</div>
-				)}
+				<div>{state.creationDate}</div>
 			</td>
 			<td>
 				<input
@@ -176,16 +174,18 @@ const TableRow = memo<HumanBeingRowProps>(props => {
 					onChange={handleBoolCarChange('cool')}
 				/>
 			</td>
-			<td>
-				{isEdit ? (
-					<>
-						<button onClick={handleSave}>save</button>
-						<button onClick={handleCancel}>cancel</button>
-					</>
-				) : (
-					<button onClick={handleEdit}>edit</button>
-				)}
-			</td>
+			{editable ? (
+				<td>
+					{isEdit ? (
+						<>
+							<button onClick={handleSave}>save</button>
+							<button onClick={handleCancel}>cancel</button>
+						</>
+					) : (
+						<button onClick={handleEdit}>edit</button>
+					)}
+				</td>
+			) : null}
 		</tr>
 	);
 });

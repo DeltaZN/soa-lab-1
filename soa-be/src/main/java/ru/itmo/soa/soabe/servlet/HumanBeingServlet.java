@@ -13,25 +13,25 @@ import ru.itmo.soa.soabe.service.HumanBeingService;
 @WebServlet(name = "humanBeing", value = "/human-being/*")
 public class HumanBeingServlet extends HttpServlet {
 
-    private static final String SORTING_PARAM = "sort";
-    private static final String PAGE_IDX_PARAM = "pageIdx";
-    private static final String PAGE_SIZE_PARAM = "pageSize";
+    public static final String SORTING_PARAM = "sort";
+    public static final String PAGE_IDX_PARAM = "pageIdx";
+    public static final String PAGE_SIZE_PARAM = "pageSize";
 
-    private static final String SOUNDTRACK_NAME_LESS_PARAM = "soundtrackNameLess";
-    private static final String MINUTES_OF_WAITING_LESS_PARAM = "minutesOfWaitingLess";
+    public static final String SOUNDTRACK_NAME_LESS_PARAM = "soundtrackNameLess";
+    public static final String MINUTES_OF_WAITING_LESS_PARAM = "minutesOfWaitingLess";
 
-    private static final String NAME_PARAM = "name";
-    private static final String MINUTES_OF_WAITING_PARAM = "minutesOfWaiting";
-    private static final String REAL_HERO_PARAM = "realHero";
-    private static final String HAS_TOOTHPICK_PARAM = "hasToothpick";
-    private static final String IMPACT_SPEED_PARAM = "impactSpeed";
-    private static final String SOUNDTRACK_NAME_PARAM = "soundtrackName";
-    private static final String WEAPON_TYPE_PARAM = "weaponType";
-    private static final String CAR_NAME_PARAM = "carName";
-    private static final String CAR_COOL_PARAM = "carCool";
-    private static final String COORDINATES_X_PARAM = "coordinatesX";
-    private static final String COORDINATES_Y_PARAM = "coordinatesY";
-    private static final String CREATION_DATE_PARAM = "creationDate";
+    public static final String NAME_PARAM = "name";
+    public static final String MINUTES_OF_WAITING_PARAM = "minutesOfWaiting";
+    public static final String REAL_HERO_PARAM = "realHero";
+    public static final String HAS_TOOTHPICK_PARAM = "hasToothpick";
+    public static final String IMPACT_SPEED_PARAM = "impactSpeed";
+    public static final String SOUNDTRACK_NAME_PARAM = "soundtrackName";
+    public static final String WEAPON_TYPE_PARAM = "weaponType";
+    public static final String CAR_NAME_PARAM = "carName";
+    public static final String CAR_COOL_PARAM = "carCool";
+    public static final String COORDINATES_X_PARAM = "coordinatesX";
+    public static final String COORDINATES_Y_PARAM = "coordinatesY";
+    public static final String CREATION_DATE_PARAM = "creationDate";
 
     private HumanBeingService service;
 
