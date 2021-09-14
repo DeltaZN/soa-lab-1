@@ -15,6 +15,7 @@ import javax.persistence.criteria.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +42,7 @@ public class HumanBeingDao {
     }
 
     public List<HumanBeing> findHumansMinutesOfWaitingLess(long minutesOfWaiting) {
-        List<HumanBeing> list = List.of();
+        List<HumanBeing> list = new ArrayList<>();
         Transaction transaction = null;
         try (Session session = HibernateDatasource.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -98,7 +99,7 @@ public class HumanBeingDao {
             totalPages = 0;
             currentPage = 0;
             totalItems = 0;
-            list = List.of();
+            list = new ArrayList<>();
         }
     }
 

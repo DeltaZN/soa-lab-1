@@ -14,6 +14,8 @@ const defaultContext: LabContext = {
 	humanBeingProvider: createHumanBeingProvider(),
 };
 
+export const BASE_URL = `soa_be_war_exploded`;
+
 export const context = React.createContext(defaultContext);
 
 export const App = () => {
@@ -24,18 +26,18 @@ export const App = () => {
 					<nav>
 						<ul>
 							<li>
-								<Link to="/">Main Page(Table)</Link>
+								<Link to={`/${BASE_URL}/`}>Main Page(Table)</Link>
 							</li>
 							<li>
-								<Link to="/special">Special operations</Link>
+								<Link to={`/${BASE_URL}/special`}>Special operations</Link>
 							</li>
 						</ul>
 					</nav>
 					<Switch>
-						<Route path="/special">
+						<Route path={`/${BASE_URL}/special`}>
 							<SpecialPage />
 						</Route>
-						<Route path="/">
+						<Route path={`/${BASE_URL}/`}>
 							<MainPage />
 						</Route>
 					</Switch>

@@ -44,39 +44,46 @@ export type PCar = Partial<Car>;
 export type PHumanBeing = Partial<HumanBeing> & { car: PCar; coordinates: PCoordinates };
 
 export interface HumanBeingProvider {
-	getAllHumans: (params?: string) => Observable<Either<Error, PaginationResult>>;
-	getHuman: (id: number) => Observable<Either<Error, HumanBeing>>;
-	createHuman: (human: HumanBeing) => Observable<Either<Error, number>>;
-	updateHuman: (human: HumanBeing) => Observable<Either<Error, void>>;
-	deleteHuman: (id: number) => Observable<Either<Error, void>>;
+	getAllHumans: (params?: string) => Observable<Either<ServerResponse<any>, PaginationResult>>;
+	getHuman: (id: number) => Observable<Either<ServerResponse<any>, HumanBeing>>;
+	createHuman: (human: HumanBeing) => Observable<Either<ServerResponse<any>, number>>;
+	updateHuman: (human: HumanBeing) => Observable<Either<ServerResponse<any>, void>>;
+	deleteHuman: (id: number) => Observable<Either<ServerResponse<any>, void>>;
 	// var-specific methods
-	deleteAnyMinutesOfWaitingEqual: (minutesOfWaiting: number) => Observable<Either<Error, number>>;
-	countAllSoundtrackNameLess: (soundtrackName: string) => Observable<Either<Error, number>>;
-	findAllMinutesOfWaitingLess: (minutesOfWaiting: number) => Observable<Either<Error, HumanBeing[]>>;
+	deleteAnyMinutesOfWaitingEqual: (minutesOfWaiting: number) => Observable<Either<ServerResponse<any>, number>>;
+	countAllSoundtrackNameLess: (soundtrackName: string) => Observable<Either<ServerResponse<any>, number>>;
+	findAllMinutesOfWaitingLess: (minutesOfWaiting: number) => Observable<Either<ServerResponse<any>, HumanBeing[]>>;
 }
 
-const humanBeingAPI = 'human-being';
+export interface ServerResponse<T> {
+	readonly body: T;
+}
+
+const humanBeingAPI = `human-being`;
 
 export const createHumanBeingProvider = (): HumanBeingProvider => {
 	const xmlBuilder = new Builder();
 
-	const requestAPI = (init: RequestInit, url: string = ''): Observable<Either<Error, any>> =>
+	const requestAPI = (init: RequestInit, url: string = ''): Observable<Either<ServerResponse<any>, any>> =>
 		from(
 			fetch(`${humanBeingAPI}${url}`, init)
 				.then(res => {
 					if (res.status === 200) {
 						return res.text();
 					}
-					return res.text().then(text => {
-						throw new Error(`${res.statusText}: ${text}`);
-					});
+					return res
+						.text()
+						.then(text => parseStringPromise(text, { explicitArray: false, ignoreAttrs: true }))
+						.then(text => {
+							throw text;
+						});
 				})
 				.then(r => parseStringPromise(r, { explicitArray: false, ignoreAttrs: true }))
 				.then(data => right(data))
-				.catch(e => left<Error>(e)),
+				.catch(e => left<ServerResponse<any>>(e.server_response)),
 		);
 
-	const getAllHumans = (params?: string): Observable<Either<Error, PaginationResult>> =>
+	const getAllHumans = (params?: string): Observable<Either<ServerResponse<any>, PaginationResult>> =>
 		requestAPI(
 			{
 				method: 'GET',
@@ -113,7 +120,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			),
 		);
 
-	const getHuman = (id: number): Observable<Either<Error, HumanBeing>> =>
+	const getHuman = (id: number): Observable<Either<ServerResponse<any>, HumanBeing>> =>
 		requestAPI(
 			{
 				method: 'GET',
@@ -145,7 +152,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			),
 		);
 
-	const createHuman = (human: HumanBeing): Observable<Either<Error, number>> =>
+	const createHuman = (human: HumanBeing): Observable<Either<ServerResponse<any>, number>> =>
 		requestAPI({
 			method: 'POST',
 			body: xmlBuilder.buildObject({ human_being: human }),
@@ -164,13 +171,13 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			),
 		);
 
-	const updateHuman = (human: HumanBeing): Observable<Either<Error, void>> =>
+	const updateHuman = (human: HumanBeing): Observable<Either<ServerResponse<any>, void>> =>
 		requestAPI({
 			method: 'PUT',
 			body: xmlBuilder.buildObject({ human_being: human }),
 		});
 
-	const deleteHuman = (id: number): Observable<Either<Error, void>> =>
+	const deleteHuman = (id: number): Observable<Either<ServerResponse<any>, void>> =>
 		requestAPI(
 			{
 				method: 'DELETE',
@@ -178,7 +185,9 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			`/${id}`,
 		);
 
-	const deleteAnyMinutesOfWaitingEqual = (minutesOfWaiting: number): Observable<Either<Error, number>> =>
+	const deleteAnyMinutesOfWaitingEqual = (
+		minutesOfWaiting: number,
+	): Observable<Either<ServerResponse<any>, number>> =>
 		requestAPI(
 			{
 				method: 'DELETE',
@@ -199,7 +208,7 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			),
 		);
 
-	const countAllSoundtrackNameLess = (soundtrackName: string): Observable<Either<Error, number>> =>
+	const countAllSoundtrackNameLess = (soundtrackName: string): Observable<Either<ServerResponse<any>, number>> =>
 		requestAPI(
 			{
 				method: 'POST',
@@ -220,7 +229,9 @@ export const createHumanBeingProvider = (): HumanBeingProvider => {
 			),
 		);
 
-	const findAllMinutesOfWaitingLess = (minutesOfWaiting: number): Observable<Either<Error, HumanBeing[]>> =>
+	const findAllMinutesOfWaitingLess = (
+		minutesOfWaiting: number,
+	): Observable<Either<ServerResponse<any>, HumanBeing[]>> =>
 		requestAPI(
 			{
 				method: 'GET',

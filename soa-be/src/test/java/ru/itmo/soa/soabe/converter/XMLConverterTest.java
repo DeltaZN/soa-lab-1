@@ -8,12 +8,7 @@ import javax.xml.bind.JAXBException;
 
 class XMLConverterTest {
 
-    private final String str = """
-            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-            <test>
-                <id>1</id>
-            </test>
-            """;
+    private final String str = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><test><id>1</id></test> ";
 
     @Test
     void toStr() {

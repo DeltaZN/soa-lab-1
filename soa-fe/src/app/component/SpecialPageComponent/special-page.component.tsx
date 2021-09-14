@@ -4,7 +4,7 @@ import { Either } from 'fp-ts/Either';
 import { constNull, constVoid, pipe } from 'fp-ts/function';
 import { either, option } from 'fp-ts';
 import { context } from '../../App';
-import { HumanBeing } from '../../provider/human-being.provider';
+import { HumanBeing, ServerResponse } from '../../provider/human-being.provider';
 import { HumanBeingCreationForm } from '../HumanBeingCreationForm/human-being-creation-form.component';
 import { HumanBeingTable } from '../HumanBeingTable/human-being-table.component';
 
@@ -49,11 +49,11 @@ export const SpecialPage = memo<SpecialPageProps>(_ => {
 		setSoundtrackName(e.target.value);
 	}, []);
 
-	const handleResult = (res: Either<Error, any>) =>
+	const handleResult = (res: Either<ServerResponse<any>, any>) =>
 		pipe(
 			res,
 			either.fold(
-				e => setLabel(some(e.toString())),
+				e => setLabel(some(e.body)),
 				data => setLabel(some(JSON.stringify(data))),
 			),
 		);
@@ -64,7 +64,7 @@ export const SpecialPage = memo<SpecialPageProps>(_ => {
 				res,
 				either.fold(
 					e => {
-						setLabel(some(e.toString()));
+						setLabel(some(e.body));
 						setHuman(none);
 					},
 					id => {
@@ -81,7 +81,7 @@ export const SpecialPage = memo<SpecialPageProps>(_ => {
 				res,
 				either.fold(
 					e => {
-						setLabel(some(e.toString()));
+						setLabel(some(e.body));
 						setHuman(none);
 					},
 					data => {
@@ -99,7 +99,7 @@ export const SpecialPage = memo<SpecialPageProps>(_ => {
 				res,
 				either.fold(
 					e => {
-						setLabel(some(e.toString()));
+						setLabel(some(e.body));
 						setHuman(none);
 					},
 					_ => {

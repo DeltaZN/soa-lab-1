@@ -11,6 +11,7 @@ import ru.itmo.soa.soabe.entity.data.validator.HumanValidator;
 import ru.itmo.soa.soabe.response.ServerResponse;
 import ru.itmo.soa.soabe.servlet.HumanBeingRequestParams;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.PrintWriter;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -64,7 +65,7 @@ public class HumanBeingService {
             PrintWriter writer = response.getWriter();
             writer.write(converter.toStr(human.get()));
         } else {
-            response.setStatus(404);
+            throw new EntityNotFoundException("Cannot find human with id " + id);
         }
     }
 
@@ -96,7 +97,7 @@ public class HumanBeingService {
             dao.updateHuman(humanBeing);
             response.setStatus(200);
         } else {
-            response.setStatus(404);
+            throw new EntityNotFoundException("Cannot update human");
         }
     }
 
@@ -104,7 +105,7 @@ public class HumanBeingService {
         if (dao.deleteHuman(id)) {
             response.setStatus(200);
         } else {
-            response.setStatus(404);
+            throw new EntityNotFoundException("Cannot find human with id " + id);
         }
     }
 }
